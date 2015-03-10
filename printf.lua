@@ -118,15 +118,14 @@ do
             if halign == "right" then cx = limitx - totalWidth end
             assert(cx ~= nil, "horizontal align must be left, center or right")
 
-            -- actual drawing, no screwing around
+            -- actual drawing
             local minOffY = math.huge
-            local offx = 0
             for s = 1, #lines[l] do
                 local segment = lines[l][s]
                 local offy = currentFont:getHeight() / 2 - segment.size[2] / 2
                 minOffY = math.min(minOffY, offy)
 
-                local px, py = cx + x + offx, cy + y + offy
+                local px, py = cx + x, cy + y + offy
                 if segment.draw then segment.draw(px, py) end
                 if segment.str then love.graphics.print(segment.str, px, py) end
 
