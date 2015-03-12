@@ -18,10 +18,11 @@ do
         end
     end
 
-	function printf_call(printf, text, x, y, limitx, halign, limity, valign)
+	function printf_call(printf, text, x, y, limitx, halign, limity, valign, scroll)
 		halign = halign or "left"
-		limity = limity or math.huge
+		limity = limity or 100000 --math.huge
 		valign = valign or "top"
+        scroll = scroll or -1
         text = text:gsub("\n", "[n]")
 
         local currentFont = love.graphics.getFont()
@@ -83,15 +84,19 @@ do
                 for n = 1, segments[i].newline do feed() end
             end
 
-            if curLine.width + segments[i].size[1] > limitx and curLine.width > 0 then
+            -- with scrolling text, don't wrap lines
+            if scroll < 0 and curLine.width + segments[i].size[1] > limitx and curLine.width > 0 then
                 feed()
             end
 
             curLine[#curLine+1] = segments[i]
-            curLine.width = curLine.width + segments[i].size[1] + currentFont:getWidth(" ")
+            curLine.width = curLine.width + segments[i].size[1] + (segments[i].appendSpace == true and currentFont:getWidth(" ") or 0)
         end
 
         -- drawing
+        local scissX, scissY, scissW, scissH = love.graphics.getScissor()
+        love.graphics.setScissor(x, y, limitx, limity)
+
         local totalHeight = 0
         for l = 1, #lines do
             local maxHeight = 0
@@ -108,16 +113,12 @@ do
         assert(cy ~= nil, "vertical align must be top, center or bottom")
 
         for l = 1, #lines do
-            local totalWidth = 0
-            for s = 1, #lines[l] do
-                totalWidth = totalWidth + lines[l][s].size[1] + (lines[l][s].appendSpace == true and currentFont:getWidth(" ") or 0)
-            end
-            lines[l].width = totalWidth
             local cx = nil
             if halign == "left" then cx = 0 end
-            if halign == "center" then cx = limitx / 2 - totalWidth / 2 end
-            if halign == "right" then cx = limitx - totalWidth end
+            if halign == "center" then cx = limitx / 2 - lines[l].width / 2 end
+            if halign == "right" then cx = limitx - lines[l].width end
             assert(cx ~= nil, "horizontal align must be left, center or right")
+            cx = cx - scroll * math.max(0, lines[l].width - limitx)
 
             -- actual drawing
             local minOffY = math.huge
@@ -134,6 +135,8 @@ do
             end
             cy = cy + minOffY + lines[l].height
         end
+
+        love.graphics.setScissor(scissX, scissY, scissW, scissH)
 
 		return errors
 	end
