@@ -22,6 +22,7 @@ do
 		halign = halign or "left"
 		limity = limity or math.huge
 		valign = valign or "top"
+        text = text:gsub("\n", "[n]")
 
         local currentFont = love.graphics.getFont()
         local strSegment = function(str)
