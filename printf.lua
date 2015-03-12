@@ -103,8 +103,8 @@ do
         end
         local cy = nil-- cursor
         if valign == "top" then cy = 0 end
-        if valign == "center" then cy = limity / 2 - totalHeight / 2 end
-        if valign == "bottom" then cy = limity - totalHeight end
+        if valign == "center" then cy = limity / 2 - currentFont:getHeight() / 2 end
+        if valign == "bottom" then cy = limity - currentFont:getHeight() end
         assert(cy ~= nil, "vertical align must be top, center or bottom")
 
         for l = 1, #lines do
@@ -160,7 +160,8 @@ do
 
     function img_call(printfImg, cmd, arguments)
         local img = printfImg[arguments[1]]
-        return {size = {img:getWidth(), img:getHeight()}, draw = function(x, y) love.graphics.draw(img, x, y) end, appendSpace = true}
+        local scale = arguments[2] or 1.0
+        return {size = {img:getWidth() * scale, img:getHeight() * scale}, draw = function(x, y) love.graphics.draw(img, x, y, 0.0, scale, scale) end, appendSpace = true}
     end
     printf["img"] = setmetatable({}, {__call = img_call})
 
