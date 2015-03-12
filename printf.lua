@@ -33,14 +33,14 @@ do
         local cursor = 1
         local errors = 0
         local segments = {}
-        while cursor < text:len() do
+        while cursor <= text:len() do
             local commandStart = text:find("[", cursor, true)
             local commandEnd = commandStart and text:find("]", commandStart + 1, true)
             local nextSpace = text:find(" ", cursor, true)
 
             if (commandStart == nil or commandEnd == nil) and nextSpace == nil  then
                 segments[#segments+1] = strSegment(text:sub(cursor))
-                cursor = text:len()
+                cursor = text:len() + 1
             else
                 local cut = nil
                 if commandStart and commandEnd and (nextSpace and commandStart < nextSpace or not nextSpace) then
