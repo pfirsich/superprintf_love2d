@@ -108,8 +108,10 @@ do
         end
         local cy = nil-- cursor
         if valign == "top" then cy = 0 end
-        if valign == "center" then cy = limity / 2 - currentFont:getHeight() / 2 end
-        if valign == "bottom" then cy = limity - currentFont:getHeight() end
+        if valign == "center_total" then cy = limity / 2 - totalHeight / 2 end
+        if valign == "bottom_total" then cy = limity - totalHeight end
+        if valign == "center" then cy = limity / 2 - currentFont:getHeight() / 2 * #lines end
+        if valign == "bottom" then cy = limity - currentFont:getHeight() / 2 * #lines end
         assert(cy ~= nil, "vertical align must be top, center or bottom")
 
         for l = 1, #lines do
@@ -159,7 +161,6 @@ do
     printf["n"] = function(cmd, arguments)
         return {newline = 1}
     end
-
 
     function img_call(printfImg, cmd, arguments)
         local img = printfImg[arguments[1]]
