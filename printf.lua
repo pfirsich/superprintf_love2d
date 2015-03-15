@@ -18,11 +18,14 @@ do
         end
     end
 
-	function printf_call(printf, text, x, y, limitx, halign, limity, valign, scroll)
+	function printf_call(printf, text, x, y, limitx, halign, limity, valign, moreparams)
 		halign = halign or "left"
 		limity = limity or 100000 --math.huge
 		valign = valign or "top"
-        scroll = scroll or -1
+        local scrollx = (moreparams and moreparams.scrollx) or -1
+        local scrolly = (moreparams and moreparams.scrolly) or -1
+        local vertScissorBorder = (moreparams and moreparams.vertScissorBorder) or 0
+
         text = text:gsub("\n", "[n]")
 
         local currentFont = love.graphics.getFont()
@@ -85,7 +88,7 @@ do
             end
 
             -- with scrolling text, don't wrap lines
-            if scroll < 0 and curLine.width + segments[i].size[1] > limitx and curLine.width > 0 then
+            if scrollx < 0 and curLine.width + segments[i].size[1] > limitx and curLine.width > 0 then
                 feed()
             end
 
@@ -95,7 +98,7 @@ do
 
         -- drawing
         local scissX, scissY, scissW, scissH = love.graphics.getScissor()
-        love.graphics.setScissor(x, y, limitx, limity)
+        love.graphics.setScissor(x, y - vertScissorBorder, limitx, limity + vertScissorBorder*2)
 
         local totalHeight = 0
         for l = 1, #lines do
@@ -113,6 +116,7 @@ do
         if valign == "center" then cy = limity / 2 - currentFont:getHeight() / 2 * #lines end
         if valign == "bottom" then cy = limity - currentFont:getHeight() / 2 * #lines end
         assert(cy ~= nil, "vertical align must be top, center or bottom")
+        if scrolly >= 0 then cy = cy - scrolly * math.max(0, totalHeight - limity) end
 
         for l = 1, #lines do
             local cx = nil
@@ -120,7 +124,7 @@ do
             if halign == "center" then cx = limitx / 2 - lines[l].width / 2 end
             if halign == "right" then cx = limitx - lines[l].width end
             assert(cx ~= nil, "horizontal align must be left, center or right")
-            cx = cx - scroll * math.max(0, lines[l].width - limitx)
+            if scrollx >= 0 then cx = cx - scrollx * math.max(0, lines[l].width - limitx) end
 
             -- actual drawing
             local minOffY = math.huge
