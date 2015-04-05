@@ -18,10 +18,10 @@ do
         end
     end
 
-	function printf_call(printf, text, x, y, limitx, halign, limity, valign, moreparams)
-		halign = halign or "left"
-		limity = limity or 100000 --math.huge
-		valign = valign or "top"
+    function printf_call(printf, text, x, y, limitx, halign, limity, valign, moreparams)
+        halign = halign or "left"
+        limity = limity or 100000 --math.huge
+        valign = valign or "top"
         local scrollx = (moreparams and moreparams.scrollx) or -1
         local scrolly = (moreparams and moreparams.scrolly) or -1
         local vertScissorBorder = (moreparams and moreparams.vertScissorBorder) or 0
@@ -144,19 +144,19 @@ do
 
         love.graphics.setScissor(scissX, scissY, scissW, scissH)
 
-		return errors
+        return errors
 	end
 
-	local printf = setmetatable({}, {__call = printf_call})
+    local printf = setmetatable({}, {__call = printf_call})
 
-	printf["blank"] = function(cmd, arguments)
-		return {size = {tonumber(arguments[1]), tonumber(arguments[2] or 0)}}
-	end
+    printf["blank"] = function(cmd, arguments)
+        return {size = {tonumber(arguments[1]), tonumber(arguments[2] or 0)}}
+    end
 
-	printf["["] = function(cmd, arguments)
-        local font = love.graphics.getFont()
-		return {str = "[", size = {font:getWidth("["), font:getHeight()}}
-	end
+    printf["["] = function(cmd, arguments)
+    local font = love.graphics.getFont()
+        return {str = "[", size = {font:getWidth("["), font:getHeight()}}
+    end
 
     printf["color"] = function(cmd, arguments)
         return {draw = function() love.graphics.setColor(unpack(arguments)) end}
